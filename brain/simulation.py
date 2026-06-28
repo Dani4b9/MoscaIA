@@ -7,7 +7,10 @@ class BrainSimulation:
 
         self.brain = brain
         self.queue = deque()
+
         self.time = 0
+
+        self.total_fired = 0
 
     def stimulate(self, neuron_id, strength=1.0):
 
@@ -17,6 +20,7 @@ class BrainSimulation:
             return False
 
         neuron.activation += strength
+
         self.queue.append(neuron)
 
         return True
@@ -25,22 +29,37 @@ class BrainSimulation:
 
         self.time += 1
 
-        fired = []
+        fired_count = 0
 
-        current = len(self.queue)
+        current_size = len(self.queue)
 
-        for _ in range(current):
+        visited = set()
+
+        queued = set()
+        
+        for _ in range(current_size):
 
             neuron = self.queue.popleft()
+
+            if neuron.refractory > 0:
+                neuron.refractory -= 1
+                continue
+
+            if neuron.root_id in visited:
+                continue
+
+            visited.add(neuron.root_id)
 
             if neuron.activation < neuron.threshold:
                 continue
 
-            neuron.fired = True
+            fired_count += 1
 
-            fired.append(neuron.root_id)
+            self.total_fired += 1
 
             neuron.activation = 0
+
+            neuron.refractory = 3
 
             for synapse in neuron.outgoing:
 
@@ -51,8 +70,10 @@ class BrainSimulation:
 
                 target.activation += synapse.weight
 
-                if target.activation >= target.threshold:
-
+                if (
+                    target.root_id not in visited
+                    and target.root_id not in queued
+                ):
                     self.queue.append(target)
-
-        return fired
+                    queued.add(target.root_id)
+        return fired_count

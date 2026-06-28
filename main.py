@@ -31,14 +31,15 @@ sim = BrainSimulation(brain)
 
 sim.stimulate(primer_id)
 
-for paso in range(5):
+for paso in range(20):
 
-    dispararon = sim.step()
+    activadas = sim.step()
 
-    print(f"Paso {paso + 1}")
-    print(f"Neuronas activadas: {len(dispararon)}")
+    print(
+        f"Paso {paso+1:2d} | "
+        f"Activadas: {activadas:7d} | "
+        f"Cola: {len(sim.queue):7d}"
+    )
 
-    if len(dispararon) > 0:
-        print(dispararon[:10])
-
-    print()
+    if activadas == 0:
+        break
