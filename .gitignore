@@ -1,0 +1,13 @@
+# Entorno virtual
+.venv/
+
+# Caché de Python
+__pycache__/
+*.pyc
+
+# Datos del conectoma
+data/
+
+# VS Code
+.vscode/
+.idea/
